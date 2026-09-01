@@ -18,7 +18,8 @@
         ]
       },
       "quickstart",
-      "BnhassinAgent"
+      "BnhassinAgent",
+      "widget"
     ],
     "global": {
       "anchors": [
