@@ -73,5 +73,15 @@
       "github": "https://github.com/mintlify",
       "linkedin": "https://linkedin.com/company/mintlify"
     }
+  },
+  "markdown": {
+    "schema": true
+  },
+  "metadata": {
+    "timestamp": true
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "latex": true
   }
 }
