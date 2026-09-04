@@ -1,0 +1,134 @@
+---
+title: "AI Gateway"
+description: "Set up Vercel AI Gateway with AI SDK and GPT-5.6 Sol for BnhassinAgent."
+keywords:
+  - "Vercel AI Gateway"
+  - "AI SDK"
+  - "GPT-5.6 Sol"
+  - "BnhassinAgent"
+  - "ADK"
+---
+
+# Vercel AI Gateway setup
+
+Use Vercel AI Gateway as the text-generation boundary for BnhassinAgent. The AI SDK accepts the model identifier `openai/gpt-5.6-sol` directly, and AI Gateway handles authentication and provider routing. GPT-5.6 Sol is available on AI Gateway. 
+
+## 1. Install the Vercel CLI
+
+```bash
+npm i -g vercel
+vercel login
+```
+
+If you are using Claude Code, Codex, or Cursor, install the Vercel plugin:
+
+```bash
+npx plugins add vercel/vercel-plugin
+```
+
+For other agents, install Vercel Skills:
+
+```bash
+npx skills add vercel-labs/agent-skills
+```
+
+## 2. Initialize the Node.js project
+
+From the directory that will contain the gateway smoke test:
+
+```bash
+mkdir bnhassinagent-ai-gateway
+cd bnhassinagent-ai-gateway
+npm init -y
+npm install ai dotenv
+npm install -D @types/node tsx typescript
+```
+
+The current AI Gateway quickstart uses `ai` and `dotenv`; the TypeScript runtime can be executed with `tsx`.
+
+## 3. Authenticate AI Gateway
+
+For local development, authenticate with Vercel and pull the project environment when working inside a linked Vercel project:
+
+```bash
+vercel login
+vercel link
+vercel env pull .env.local
+```
+
+AI Gateway expects `AI_GATEWAY_API_KEY` when using an API key. Do not commit `.env.local` or any API key to Git.
+
+If you prefer a standalone environment file, create `.env`:
+
+```dotenv
+AI_GATEWAY_API_KEY=your_vercel_ai_gateway_key
+```
+
+## 4. Create the streaming smoke test
+
+Create `index.ts`:
+
+```ts
+import { streamText } from 'ai';
+import 'dotenv/config';
+
+async function main() {
+  const result = streamText({
+    model: 'openai/gpt-5.6-sol',
+    prompt: 'Explain how BnhassinAgent can use AI Gateway as its model-provider boundary in three concise points.',
+  });
+
+  for await (const textPart of result.textStream) {
+    process.stdout.write(textPart);
+  }
+
+  console.log();
+  console.log('Token usage:', await result.usage);
+  console.log('Finish reason:', await result.finishReason);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+```
+
+This follows the AI Gateway streaming pattern: iterate over `result.textStream`, then await `result.usage` to inspect token consumption.
+
+## 5. Run the verification
+
+```bash
+npx tsx index.ts
+```
+
+A successful run should stream generated text to the terminal and then print token usage and the finish reason.
+
+## 6. Connect it to BnhassinAgent Runtime
+
+Keep this integration behind a model-provider boundary rather than coupling ADK orchestration directly to OpenAI. A practical separation is:
+
+```text
+BnhassinAgent Runtime
+        |
+        +-- Agent orchestration / ADK
+        |
+        +-- ModelProvider interface
+                 |
+                 +-- Vercel AI Gateway
+                         |
+                         +-- openai/gpt-5.6-sol
+```
+
+ADK can remain responsible for agent orchestration, planning, tool selection, evaluation, and stateful workflow logic. The gateway adapter owns model invocation, streaming, usage accounting, routing, and provider-specific concerns.
+
+## 7. Production recommendations
+
+- Keep `AI_GATEWAY_API_KEY` outside source control and inject it through the deployment environment.
+- Centralize the model ID in configuration so Sol can later be replaced by Terra, Luna, or another provider without changing orchestration code.
+- Persist request metadata and token usage in the BnhassinAgent run/message tables rather than logging secrets.
+- Add gateway fallbacks for production workloads when availability is more important than a single provider.
+- Add automated smoke tests that verify streaming, non-empty output, usage metadata, and failure handling.
+
+## Model identifier
+
+The requested model identifier is valid: `openai/gpt-5.6-sol`. Vercel lists GPT-5.6 Sol as the flagship GPT-5.6 model on AI Gateway, and its AI SDK example uses this exact identifier.
