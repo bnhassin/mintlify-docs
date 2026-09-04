@@ -14,13 +14,12 @@
         "group": "Getting Started",
         "pages": [
           "index",
-          "quickstart"
+          "quickstart",
+          "ai-gateway"
         ]
       },
       "quickstart",
       "BnhassinAgent",
-      "widget",
-      "widget-1",
       "untitled-page"
     ],
     "global": {
