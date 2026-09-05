@@ -20,7 +20,14 @@
       },
       "quickstart",
       "BnhassinAgent",
-      "untitled-page"
+      "untitled-page",
+      {
+        "group": "Essentials",
+        "icon": "book",
+        "pages": [
+          "personalised-chat"
+        ]
+      }
     ],
     "global": {
       "anchors": [
