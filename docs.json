@@ -76,7 +76,8 @@
   "footer": {
     "socials": {
       "x": "https://x.com/bnhassin ",
-      "github": "https://github.com/bnhassin"
+      "github": "https://github.com/bnhassin",
+      "slack": "https://bnhassin.slack.com"
     }
   },
   "markdown": {
